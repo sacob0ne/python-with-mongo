@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-app-internal
+  namespace: default
+  labels:
+    app: python-app
+spec:
+  type: NodePort
+  selector:
+    app: python-app
+  ports:
+    - name: python-app
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  namespace: default
+  labels:
+    app: python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
+      containers:
+        - name: python-app
+          image: 
+          imagePullPolicy: Never
+          ports:
+            - name: python-app
+              containerPort: 5000
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "0.5"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
+          securityContext:
+            capabilities:
+              add: ["SYS_PTRACE"]
+          readinessProbe:
+            tcpSocket:
+              port: 5000
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 15
+          livenessProbe:
+            tcpSocket:
+              port: 5000
+            failureThreshold: 3
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            successThreshold: 1
+            timeoutSeconds: 15

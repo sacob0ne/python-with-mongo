@@ -1,0 +1,21 @@
+version: '3.6'
+services:
+  python-microservice:
+    build:
+      context: .
+    container_name: python-microservice
+    networks:
+      - test-tiko
+    depends_on:
+      - "mongodb"
+    ports:
+      - 5000:5000
+  mongodb:
+    image: mongo:4
+    container_name: mongodb
+    networks:
+      - test-tiko
+    ports:
+      - 27017:27017
+networks:
+  test-tiko: {}
