@@ -5,7 +5,7 @@ services:
       context: .
     container_name: python-microservice
     networks:
-      - test-tiko
+      - test-network
     depends_on:
       - "mongodb"
     ports:
@@ -14,8 +14,8 @@ services:
     image: mongo:4
     container_name: mongodb
     networks:
-      - test-tiko
+      - test-network
     ports:
       - 27017:27017
 networks:
-  test-tiko: {}
+  test-network: {}
